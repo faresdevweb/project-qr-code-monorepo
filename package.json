@@ -1,0 +1,21 @@
+{
+  "name": "project-qr-code-monorepo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "packages/backend",
+    "packages/client-desktop",
+    "packages/client-mobile"
+  ]
+}
