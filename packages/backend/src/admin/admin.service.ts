@@ -1,6 +1,15 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { 
+    BadRequestException, 
+    ConflictException, 
+    Injectable, 
+    NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateClassDTO, CreateFiliereDTO, CreateYearDTO, createGroupDto } from './dto';
+import { 
+    CreateClassDTO, 
+    CreateFiliereDTO, 
+    CreateYearDTO, 
+    createGroupDto, 
+    createCourseDto } from './dto';
 
 @Injectable()
 export class AdminService {
@@ -143,5 +152,33 @@ export class AdminService {
                 }
             }
         })
-       }
+    }
+
+    async createCourse(createCourseDto: createCourseDto, request: any) {
+        const schoolId = request.user.schoolId;
+        
+        const startTime = new Date(createCourseDto.startingTime);
+        const endTime = new Date(startTime);
+        endTime.setHours(endTime.getHours() + createCourseDto.duration);
+    
+        return this.prismaService.course.create({
+            data: {
+                name: createCourseDto.name,
+                teacherId: createCourseDto.teacherId,
+                startTime: startTime,
+                endTime: endTime,
+                duration: createCourseDto.duration,
+                Groupe: {
+                    connect: {
+                        id: createCourseDto.groupId
+                    }
+                },
+                School: {
+                    connect: {
+                        id: schoolId
+                    }
+                }
+            }
+        });
+    }
 }

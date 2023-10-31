@@ -8,12 +8,17 @@ import {
     Request, 
     UseInterceptors, 
     UploadedFile,
-    Put} from '@nestjs/common';
+    Put } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { Roles } from 'src/decorators';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateClassDTO, CreateFiliereDTO, CreateYearDTO, createGroupDto } from './dto';
+import { 
+    CreateClassDTO, 
+    CreateFiliereDTO, 
+    CreateYearDTO, 
+    createGroupDto, 
+    createCourseDto } from './dto';
 
 @Controller('admin')
 export class AdminController {
@@ -59,5 +64,12 @@ export class AdminController {
       @Request() req: any
     ) {
         return this.adminService.createGroup(createGroupDTO, req.user);
+    }
+
+    @Post("createCourse")
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    createCourse(@Body() createCourseDto: createCourseDto, @Request() req: any) {
+      return this.adminService.createCourse(createCourseDto,req);
     }
 }
