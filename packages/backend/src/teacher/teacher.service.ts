@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as jwt from 'jsonwebtoken';
 import * as qrcode from 'qrcode';
+import { ReportIssueDto } from './dto/reportIssue.dto';
 
 @Injectable()
 export class TeacherService {
@@ -38,5 +39,28 @@ export class TeacherService {
         const qrCodeImage = await qrcode.toDataURL(token);
     
         return qrCodeImage;
+    }
+
+    async reportIssue(courseId: string, reportDto: ReportIssueDto) {
+        // Ajouter les détails du problème au cours
+        const course = this.prismaService.course.findUnique({
+            where: {
+                id: courseId
+            }
+        })
+        if (!course) throw new Error('Course not found');
+
+        return this.prismaService.course.update({
+            where: {
+                id: courseId
+            },
+            data: {
+                reportIssues: {
+                    create: {
+                        message: reportDto.description
+                    }
+                }
+            }
+        })
     }
 }

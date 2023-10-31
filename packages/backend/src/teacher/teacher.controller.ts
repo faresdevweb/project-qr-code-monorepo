@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Put, UseGuards, Request, Post } from '@ne
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { Roles } from 'src/decorators';
 import { TeacherService } from './teacher.service';
+import { ReportIssueDto } from './dto/reportIssue.dto';
 
 @Controller('teacher')
 export class TeacherController {
@@ -29,5 +30,12 @@ export class TeacherController {
     @Roles('TEACHER')
     generateQrCode(@Param('courseId') courseId: string) {
         return this.teacherService.generateQrCode(courseId);
+    }
+
+    @Post(':courseId/report-issue')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('TEACHER')
+    reportIssue(@Param('courseId') courseId: string, @Body() reportDto: ReportIssueDto) {
+        return this.teacherService.reportIssue(courseId, reportDto);
     }
 }
