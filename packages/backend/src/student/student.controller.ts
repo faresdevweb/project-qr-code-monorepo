@@ -11,4 +11,15 @@ export class StudentController {
     constructor(
         private studentService: StudentService
     ){}
+
+    @Put(':courseId/sign-in')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('STUDENT')
+    answerToCallStudents(
+      @Param('courseId') courseId: string,
+      @Req() req: Request,
+      @Body('token') qrToken: string
+    ) {
+      return this.studentService.signInWithQr(courseId, (req.user as any).id, qrToken);
+    }
 }
