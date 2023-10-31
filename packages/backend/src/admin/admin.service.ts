@@ -1,6 +1,6 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateClassDTO, CreateFiliereDTO, CreateYearDTO } from './dto';
+import { CreateClassDTO, CreateFiliereDTO, CreateYearDTO, createGroupDto } from './dto';
 
 @Injectable()
 export class AdminService {
@@ -106,4 +106,42 @@ export class AdminService {
         });
         
     }
+
+    async createGroup(createGroupDTO: createGroupDto, user: any) {
+        const schoolId = user.schoolId;
+    
+        const classe = await this.prismaService.classe.findFirst({
+            where: {
+                id: createGroupDTO.classId,
+            },
+            include: {
+                Year: true
+            }
+        });
+        if (!classe) throw new NotFoundException('Class not found');
+        if (classe.yearId !== createGroupDTO.yearId) {
+            throw new BadRequestException('The specified class does not belong to the provided year.');
+        }
+    
+        const existingGroup = await this.prismaService.groupe.findFirst({
+            where: {
+                name: createGroupDTO.name,
+                classeId: createGroupDTO.classId,
+                yearId: createGroupDTO.yearId
+            }
+        });
+        if (existingGroup) throw new ConflictException("Le groupe existe déjà pour cette classe et cette année.");
+    
+        return this.prismaService.groupe.create({
+            data: {
+                name: createGroupDTO.name,
+                classeId: createGroupDTO.classId,
+                Year: {
+                    connect: {
+                        id: createGroupDTO.yearId
+                    }
+                }
+            }
+        })
+       }
 }
