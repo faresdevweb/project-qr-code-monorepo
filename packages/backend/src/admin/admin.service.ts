@@ -11,6 +11,7 @@ import {
     createGroupDto, 
     createCourseDto, 
     addStudentsToCourseDTO} from './dto';
+import { parseCSV } from 'src/utils';
 
 @Injectable()
 export class AdminService {
@@ -205,5 +206,54 @@ export class AdminService {
                 studentsIds: { set: updatedStudentIds },
             },
         });
+    }
+
+    async addStudentsToClassAndGroup(classId: string, file: Express.Multer.File) {
+        const students = await parseCSV(file.buffer.toString());
+        const studentsIds = [];
+        const notFoundEmails = [];
+    
+        // Chercher la classe pour obtenir le yearId
+        const targetClass = await this.prismaService.classe.findFirst({
+            where: { id: classId }
+        });
+        if (!targetClass) {
+            console.error(`Classe with ID ${classId} not found.`);
+            return;
+        }
+        const targetYearId = targetClass.yearId;
+    
+        for (const student of students) {
+            const user = await this.prismaService.user.findFirst({
+                where: { email: student.email }
+            });
+    
+            if (!user) {
+                notFoundEmails.push(student.email);
+                continue;
+            }
+    
+            const targetGroupe = await this.prismaService.groupe.findFirst({
+                where: { 
+                    name: student.groupe, // Assumant que le groupe est identifié par son nom
+                    yearId: targetYearId  // Vérification supplémentaire
+                }
+            });
+    
+            if (!targetGroupe) {
+                console.warn(`Groupe ${student.groupe} not found or not in the specified class for email: ${student.email}`);
+                continue;
+            }
+    
+            studentsIds.push(user.id);
+    
+            await this.prismaService.user.update({
+                where: { id: user.id },
+                data: { 
+                    classeId: classId,
+                    groupeId: targetGroupe.id 
+                }
+            });
+        }
     }
 }

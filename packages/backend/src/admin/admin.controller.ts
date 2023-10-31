@@ -83,4 +83,15 @@ export class AdminController {
     ) {
       return this.adminService.addGroupeToCourse(courseId, addStudentsDto);
     }
+
+    @Put(':classId/add-students')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    @UseInterceptors(FileInterceptor('csv'))
+    addStudentsToClassAndGroup(
+      @Param('classId') classId: string,
+      @UploadedFile() file: Express.Multer.File
+    ) {
+        return this.adminService.addStudentsToClassAndGroup(classId, file);
+    }
 }
