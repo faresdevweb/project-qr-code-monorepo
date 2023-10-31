@@ -23,4 +23,11 @@ export class TeacherController {
     startCourse(@Param('courseId') courseId: string) {
       return this.teacherService.startCourse(courseId);
     }
+
+    @Get(':courseId/generate-qr')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('TEACHER')
+    generateQrCode(@Param('courseId') courseId: string) {
+        return this.teacherService.generateQrCode(courseId);
+    }
 }

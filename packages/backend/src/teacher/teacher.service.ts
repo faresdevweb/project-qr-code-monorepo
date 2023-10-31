@@ -24,4 +24,19 @@ export class TeacherService {
             data: { started: true }
         });
     }
+
+    async generateQrCode(courseId: string): Promise<string> {
+        // Générer un JWT avec l'ID du cours et un timestamp d'expiration
+        const tokenPayload = {
+            courseId: courseId,
+            exp: Math.floor(Date.now() / 1000) + 10  // Expiration après 10 secondes
+        };
+    
+        const token = jwt.sign(tokenPayload, 'YOUR_SECRET_KEY');
+    
+        // Générer le QR Code à partir du token
+        const qrCodeImage = await qrcode.toDataURL(token);
+    
+        return qrCodeImage;
+    }
 }
