@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { signInDTO, maintenanceAccountDTO, createSchoolDTO } from './dto';
+import { signInDTO, maintenanceAccountDTO, createSchoolDTO, createAdminDTO } from './dto';
 import { JwtGuard, RolesGuard } from './guard';
 import { Roles } from 'src/decorators';
 
@@ -31,6 +31,13 @@ export class AuthController {
     @Roles('MAINTENANCE')
     async createSchool(@Body() createSchoolDto: createSchoolDTO) {
         return this.authService.createSchool(createSchoolDto);
+    }
+
+    @UseGuards(JwtGuard, RolesGuard)
+    @Post('createAdmin')
+    @Roles('MAINTENANCE')
+    async createAdmin(@Body() createAdminDto: createAdminDTO) {
+        return this.authService.createAdmin(createAdminDto);
     }
 
 

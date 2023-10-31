@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import * as argon from 'argon2';
-import { signInDTO, maintenanceAccountDTO, createSchoolDTO } from './dto';
+import { signInDTO, maintenanceAccountDTO, createSchoolDTO, createAdminDTO } from './dto';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
@@ -110,6 +110,36 @@ export class AuthService {
         })
         // retourne l'école créée
         return school
+    }
+
+    async createAdmin(createAdminDto: createAdminDTO) {
+        // hash le mot de passe
+        const hashedPassword = await argon.hash(createAdminDto.password)
+        // vérifié que l'école pour cette admin existe
+        const school = await this.prisma.school.findFirst({
+            where: {
+                customId: createAdminDto.schoolCustomId
+            }
+        })
+
+        if(!school) throw new ForbiddenException("School does not exist")
+
+        // crée un admin avec l'email, le mot de passe et l'école spécifiés
+        const admin = await this.prisma.user.create({
+            data: {
+                email: createAdminDto.email,
+                hashPassword: hashedPassword,
+                role: "ADMIN",
+                School: {
+                    connect: {
+                        id: school.id
+                    }
+                }
+            } as any // Cast to any to avoid type error
+        })
+
+        // retourne l'admin créé (avec son JWT)
+        return this.signJWT(admin)
     }
 
 }
