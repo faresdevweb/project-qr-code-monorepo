@@ -94,4 +94,13 @@ export class AdminController {
     ) {
         return this.adminService.addStudentsToClassAndGroup(classId, file);
     }
+
+    @Get(":courseId/sign-in-info")
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    getSignInStudents(@Param('courseId') courseId: string) {
+        return this.adminService.getSignInInfo(courseId);
+    }
+
+    
 }

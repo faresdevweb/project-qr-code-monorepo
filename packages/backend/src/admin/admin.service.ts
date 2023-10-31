@@ -256,4 +256,50 @@ export class AdminService {
             });
         }
     }
+
+    async getSignInInfo(courseId: string) {
+        const course = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId
+            },
+            select: {
+                started: true,
+                signedInStudents: true,
+                studentsIds: true,
+                name: true // ajouté pour obtenir le nom du cours (facultatif)
+            }
+        });
+    
+        if (!course) throw new Error('Course not found');
+        
+        // Vérification si le cours a commencé
+        if (!course.started) {
+            return { message: "Le cours n'as pas commencé" };
+        }
+    
+        // Vérification si tous les étudiants ont signé
+        if (course.signedInStudents.length === course.studentsIds.length) {
+            return { message: "Tous les étudiants sont présents" };
+        }
+    
+        // Si des étudiants manquent, obtenez leurs noms
+        const missingStudentsIds = course.studentsIds.filter(id => !course.signedInStudents.includes(id));
+    
+        const missingStudents = await this.prismaService.user.findMany({
+            where: {
+                id: {
+                    in: missingStudentsIds
+                }
+            },
+            select: {
+                firstName: true,
+                lastName: true
+            }
+        });
+    
+        return { 
+            message: `Il manque ${missingStudents.length} étudiant(s) dans ce cours.`,
+            missingStudents
+        };
+    }
 }
