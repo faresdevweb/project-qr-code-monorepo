@@ -27,6 +27,47 @@ export class AdminController {
         private adminService: AdminService
     ){}
 
+    @Get('getFiliere')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    getFiliere(@Request() req: any) {
+        return this.adminService.getFiliere(req);
+    }
+
+    @Get('getYear')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    getYear(@Request() req: any) {
+        return this.adminService.getYear(req);
+    }
+
+    @Get('getClass')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    getClass(
+      @Request() req: any
+    ) {
+        return this.adminService.getClass(req);
+    }
+
+    @Get('getGroup')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    getGroup(
+      @Request() req: any
+    ) {
+        return this.adminService.getGroup(req);
+    }
+
+    @Get('getCourse')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    getCourse(
+      @Request() req: any
+    ) {
+        return this.adminService.getCourse(req);
+    }
+
     @Post("createFiliere")
     @UseGuards(JwtGuard, RolesGuard)
     @Roles('ADMIN')

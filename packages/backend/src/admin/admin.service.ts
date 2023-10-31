@@ -19,6 +19,68 @@ export class AdminService {
         private prismaService: PrismaService
     ){}
 
+    async getFiliere(user: any) {
+        // récupère l'id de l'école a partir du token (request.user.schoolId)
+        const schoolId = user.schoolId;
+        return this.prismaService.filiere.findMany({
+            where: {
+                schoolId: schoolId
+            }
+        })
+    }
+
+    async getYear(user: any) {
+        // récupère l'id de l'école a partir du token (request.user.schoolId)
+        const schoolId = user.schoolId;
+        return this.prismaService.year.findMany({
+            where: {
+                Filiere: {
+                    schoolId: schoolId
+                }
+            }
+        })
+    }
+    
+    async getClass(user: any) {
+        // récupère l'id de l'école a partir du token (request.user.schoolId)
+        const schoolId = user.schoolId;
+        return this.prismaService.classe.findMany({
+            where: {
+                Year: {
+                    Filiere: {
+                        schoolId: schoolId
+                    }
+                }
+            }
+        })
+    }
+
+    async getGroup(user: any) {
+        // récupère l'id de l'école a partir du token (request.user.schoolId)
+        const schoolId = user.schoolId;
+        return this.prismaService.groupe.findMany({
+            where: {
+                Year: {
+                    Filiere: {
+                        schoolId: schoolId
+                    }
+                }
+            }
+        })
+    }
+
+    async getCourse(user: any) {
+        // récupère l'id de l'école a partir du token (request.user.schoolId)
+        const schoolId = user.schoolId;
+        return this.prismaService.course.findMany({
+            where: {
+                School: {
+                    id: schoolId
+                }
+            }
+        })
+    }
+
     async createFiliere(createFiliereDto: CreateFiliereDTO, user: any) {
         // récupère l'id de l'école a partir du token (request.user.schoolId)
         const schoolId = user.schoolId;
