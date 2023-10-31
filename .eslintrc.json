@@ -1,20 +1,63 @@
 {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "node": true
     },
     "extends": [
-        "eslint:recommended"
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "./tsconfig.json"
     },
     "plugins": [
-        "@typescript-eslint",
+        "eslint:recommended",
         "react"
     ],
     "rules": {
-    }
+    },
+    "overrides": [
+        {
+            "files": ["packages/backend/**/*"],
+            "rules": {
+                "@typescript-eslint/no-var-requires": "off",
+                "eslint-disable-next-line no-unused-vars": "on"
+            }
+        },
+        {
+            "files": ["packages/client-desktop/**/*"],
+            "extends": [
+                "plugin:react/recommended"
+            ],
+            "rules": {
+            },
+            "settings": {
+                "react": {
+                    "version": "detect"
+                }
+            }
+        },
+        {
+            "files": ["packages/client-mobile/**/*"],
+            "extends": [
+                "plugin:react/recommended",
+                "plugin:react-native/all"
+            ],
+            "rules": {
+                // Règles spécifiques à React Native
+            },
+            "settings": {
+                "react": {
+                    "version": "detect"
+                }
+            },
+            "env": {
+                "react-native/react-native": true
+            }
+        }
+    ]
 }
