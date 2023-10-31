@@ -40,8 +40,6 @@ export class AuthService {
             email: user.email
         };
     
-        
-
         if (['ADMIN', 'TEACHER', 'STUDENT'].includes(user.role)) {
             
             if (!user.schoolId) {
