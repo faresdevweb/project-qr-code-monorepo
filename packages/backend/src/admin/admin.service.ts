@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateFiliereDTO, CreateYearDTO } from './dto';
+import { CreateClassDTO, CreateFiliereDTO, CreateYearDTO } from './dto';
 
 @Injectable()
 export class AdminService {
@@ -66,5 +66,44 @@ export class AdminService {
                 }
             }
         })
+    }
+
+    async createClass(createClassDTO: CreateClassDTO, user: any) {
+        // récupère l'id de l'école a partir du token (request.user.schoolId)
+        const schoolId = user.schoolId;
+
+        // je retrouve l'année a laquelle appartiendra la classe en question
+        const year = await this.prismaService.year.findFirst({
+            where: {
+                id: createClassDTO.yearId,
+                Filiere: {
+                    schoolId: schoolId
+                }
+            }
+        });
+        if (!year) throw new NotFoundException('Year not found');
+
+        // je vérifie que la classe n'existe pas déjà pour cette année
+        const existingClass = await this.prismaService.classe.findFirst({
+            where: {
+                name: createClassDTO.name,
+                yearId: createClassDTO.yearId
+            }
+        })
+        
+        if (existingClass) throw new ConflictException("La classe existe déjà pour cette année.");
+
+        // création de la classe
+        return this.prismaService.classe.create({
+            data: {
+                name: createClassDTO.name,
+                Year: {
+                    connect: {
+                        id: createClassDTO.yearId
+                    }
+                }
+            }
+        });
+        
     }
 }
