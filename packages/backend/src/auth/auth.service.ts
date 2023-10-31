@@ -1,9 +1,10 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import * as argon from 'argon2';
-import { signInDTO } from './dto';
+import { signInDTO, maintenanceAccountDTO } from './dto';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class AuthService {
@@ -65,5 +66,29 @@ export class AuthService {
         return {
             access_token: token,
         };
+    }
+
+    async createMaintenanceAccount(maintenanceAccountDTO: maintenanceAccountDTO){
+        // hash password
+        const hashedPassword = await argon.hash(maintenanceAccountDTO.password)
+        try {
+            // save maintenance user to db
+            const maintenanceUser = await this.prisma.user.create({
+                data: {
+                    email: maintenanceAccountDTO.email,
+                    hashPassword: hashedPassword,
+                    role: "MAINTENANCE"
+                }
+            })
+            // return token JWT
+            return this.signJWT(maintenanceUser)
+        } catch (error) {
+            if(error instanceof PrismaClientKnownRequestError){
+                if(error.code === "P2002"){
+                    throw new ForbiddenException("Email already exists")
+                }
+            }
+            throw new ForbiddenException("Cannot create maintenance account", error)
+        }
     }
 }
