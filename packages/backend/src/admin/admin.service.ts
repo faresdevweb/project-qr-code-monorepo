@@ -302,4 +302,17 @@ export class AdminService {
             missingStudents
         };
     }
+
+    async getIssues(courseId: string) {
+        const course = await this.prismaService.course.findUnique({
+            where: {
+                id: courseId
+            },
+            include: {
+                reportIssues: true
+            }
+        });
+        if (!course) throw new Error('Course not found');
+        return course.reportIssues;
+    }
 }

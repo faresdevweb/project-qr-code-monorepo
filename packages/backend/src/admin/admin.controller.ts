@@ -102,5 +102,11 @@ export class AdminController {
         return this.adminService.getSignInInfo(courseId);
     }
 
+    @Get(':courseId')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    getIssues(@Param('courseId') courseId: string) {
+        return this.adminService.getIssues(courseId);
+    }
     
 }
