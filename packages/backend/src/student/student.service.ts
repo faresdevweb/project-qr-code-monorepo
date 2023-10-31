@@ -57,4 +57,17 @@ export class StudentService {
             }
         });
     }
+
+    async getSchedule(studentId: string): Promise<Course[]> {
+        return await this.prismaService.course.findMany({
+            where: {
+                studentsIds: {
+                    has: studentId
+                }
+            },
+            orderBy: {
+                startTime: 'asc'  // Optionnel, pour trier les cours par ordre chronologique
+            }
+        });
+    }
 }

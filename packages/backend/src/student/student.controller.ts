@@ -22,4 +22,13 @@ export class StudentController {
     ) {
       return this.studentService.signInWithQr(courseId, (req.user as any).id, qrToken);
     }
+
+    @Get('schedule')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('STUDENT')
+    getSchedule(@Req() req: Request) {
+      return this.studentService.getSchedule((req.user as any).id);
+    }
+
+    
 }
