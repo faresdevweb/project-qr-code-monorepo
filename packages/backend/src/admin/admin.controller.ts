@@ -13,7 +13,7 @@ import { AdminService } from './admin.service';
 import { Roles } from 'src/decorators';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateFiliereDTO } from './dto';
+import { CreateFiliereDTO, CreateYearDTO } from './dto';
 
 @Controller('admin')
 export class AdminController {
@@ -29,5 +29,15 @@ export class AdminController {
       @Request() req: any
     ) {
         return this.adminService.createFiliere(createFiliereDTO,req.user);
+    }
+
+    @Post("createYear")
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    createYear(
+      @Body() createYearDTO: CreateYearDTO,
+      @Request() req: any
+    ) {
+        return this.adminService.createYear(createYearDTO, req.user);
     }
 }
