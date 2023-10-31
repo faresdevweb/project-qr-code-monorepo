@@ -16,4 +16,11 @@ export class TeacherController {
         // Utilisez l'ID de l'enseignant à partir du token JWT ou de la requête.
         return this.teacherService.getCoursesForTeacher(req);
     }
+
+    @Put(':courseId/start')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('TEACHER')
+    startCourse(@Param('courseId') courseId: string) {
+      return this.teacherService.startCourse(courseId);
+    }
 }

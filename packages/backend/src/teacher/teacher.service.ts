@@ -17,4 +17,11 @@ export class TeacherService {
             },
         });
     }
+
+    async startCourse(courseId: string) {
+        return this.prismaService.course.update({
+            where: { id: courseId },
+            data: { started: true }
+        });
+    }
 }
