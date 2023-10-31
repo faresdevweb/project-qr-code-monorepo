@@ -8,4 +8,12 @@ export class TeacherController {
     constructor(
         private readonly teacherService: TeacherService
     ){}
+
+    @Get('getCourses')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('TEACHER')
+    getCoursesForTeacher(@Request() req: any) {
+        // Utilisez l'ID de l'enseignant à partir du token JWT ou de la requête.
+        return this.teacherService.getCoursesForTeacher(req);
+    }
 }

@@ -8,4 +8,13 @@ export class TeacherService {
     constructor(
         private readonly prismaService: PrismaService
     ){}
+
+    async getCoursesForTeacher(user: any) {
+        const teacherId = user.id;
+        return this.prismaService.course.findMany({
+            where: {
+                teacherId: teacherId
+            },
+        });
+    }
 }
