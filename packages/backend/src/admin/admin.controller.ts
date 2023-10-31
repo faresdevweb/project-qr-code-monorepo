@@ -18,7 +18,8 @@ import {
     CreateFiliereDTO, 
     CreateYearDTO, 
     createGroupDto, 
-    createCourseDto } from './dto';
+    createCourseDto, 
+    addStudentsToCourseDTO} from './dto';
 
 @Controller('admin')
 export class AdminController {
@@ -71,5 +72,15 @@ export class AdminController {
     @Roles('ADMIN')
     createCourse(@Body() createCourseDto: createCourseDto, @Request() req: any) {
       return this.adminService.createCourse(createCourseDto,req);
+    }
+
+    @Put(':courseId/add-students-to-course')
+    @UseGuards(JwtGuard, RolesGuard)
+    @Roles('ADMIN')
+    addGroupeToCourse(
+      @Param('courseId') courseId: string, 
+      @Body() addStudentsDto: addStudentsToCourseDTO
+    ) {
+      return this.adminService.addGroupeToCourse(courseId, addStudentsDto);
     }
 }

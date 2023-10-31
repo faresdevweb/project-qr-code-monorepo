@@ -9,7 +9,8 @@ import {
     CreateFiliereDTO, 
     CreateYearDTO, 
     createGroupDto, 
-    createCourseDto } from './dto';
+    createCourseDto, 
+    addStudentsToCourseDTO} from './dto';
 
 @Injectable()
 export class AdminService {
@@ -179,6 +180,30 @@ export class AdminService {
                     }
                 }
             }
+        });
+    }
+    async addGroupeToCourse(courseId: string, addStudentsDto: addStudentsToCourseDTO) {
+        const course = await this.prismaService.course.findUnique({
+            where: { id: courseId },
+        });
+
+        if (!course) throw new NotFoundException(`Course with id ${courseId} not found`);
+        
+        // Vérifier si le groupeId du cours est le même que celui fourni dans addStudentsDto
+        if (course.groupeId !== addStudentsDto.groupId) throw new BadRequestException('The groupId provided does not match the course groupId.');
+
+        // S'assurez que les étudiants ajoutés appartiennent au même groupe que le cours
+        const students = await this.prismaService.user.findMany({
+            where: { groupeId: addStudentsDto.groupId },
+        });
+
+        const updatedStudentIds = students.map((student) => student.id);
+
+        return this.prismaService.course.update({
+            where: { id: courseId },
+            data: {
+                studentsIds: { set: updatedStudentIds },
+            },
         });
     }
 }
