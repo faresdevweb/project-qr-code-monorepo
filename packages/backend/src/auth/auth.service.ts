@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import * as argon from 'argon2';
-import { signInDTO, maintenanceAccountDTO } from './dto';
+import { signInDTO, maintenanceAccountDTO, createSchoolDTO } from './dto';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
@@ -89,4 +89,27 @@ export class AuthService {
             throw new ForbiddenException("Cannot create maintenance account", error)
         }
     }
+
+    async createSchool(createSchoolDto: createSchoolDTO) {
+        // vérifie qu'une école avec le même nom ou schoolId n'existe pas déjà
+        const schoolExists = await this.prisma.school.findFirst({
+            where: { 
+                    name: createSchoolDto.name 
+                }, 
+            });
+        if (schoolExists) {
+            throw new ForbiddenException("School already exists")
+        }
+
+        // crée une école avec le nom et schoolId spécifiés
+        const school = await this.prisma.school.create({
+            data: {
+                name: createSchoolDto.name,
+                customId: createSchoolDto.schoolId
+            }
+        })
+        // retourne l'école créée
+        return school
+    }
+
 }
