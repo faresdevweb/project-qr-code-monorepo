@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  hashPassword String
+  role         UserRole
+  firstName    String?
+  lastName     String?
+  Groupe       Groupe?  @relation(fields: [groupeId], references: [id])
+  groupeId     String?  @db.ObjectId
+  Classe       Classe?  @relation(fields: [classeId], references: [id])
+  classeId     String?  @db.ObjectId
+  School       School?  @relation(fields: [schoolId], references: [id])
+  schoolId     String?  @db.ObjectId
+  Filiere      Filiere? @relation(fields: [filiereId], references: [id])
+  filiereId    String?  @db.ObjectId
+  Year         Year?    @relation(fields: [yearId], references: [id])
+  yearId       String?  @db.ObjectId
+}
+
+model Course {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  teacherId        String
+  studentsIds      String[]
+  signedInStudents String[]
+  startTime        DateTime
+  endTime          DateTime?
+  duration         Int // en heures
+  started          Boolean   @default(false)
+  reportIssues     Issue[]
+  School           School    @relation(fields: [schoolId], references: [id])
+  schoolId         String    @db.ObjectId
+  Groupe           Groupe?   @relation(fields: [groupeId], references: [id])
+  groupeId         String?   @db.ObjectId
+}
+
+model Issue {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  message  String
+  Course   Course? @relation(fields: [courseId], references: [id])
+  courseId String? @db.ObjectId
+}
+
+model QrCode {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId    String
+  generatedAt DateTime @default(now())
+  isActive    Boolean
+}
+
+model School {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  customId String    @unique
+  users    User[]
+  courses  Course[]
+  Filiere  Filiere[]
+}
+
+model Filiere {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  School   School @relation(fields: [schoolId], references: [id])
+  schoolId String @db.ObjectId
+  years    Year[]
+  User     User[]
+}
+
+model Year {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  year      String
+  Filiere   Filiere  @relation(fields: [filiereId], references: [id])
+  filiereId String   @db.ObjectId
+  User      User[]
+  Groupe    Groupe[]
+  Classe    Classe[]
+}
+
+model Groupe {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  Year     Year     @relation(fields: [yearId], references: [id])
+  yearId   String   @db.ObjectId
+  classeId String   @db.ObjectId
+  courses  Course[]
+  User     User[]
+}
+
+model Classe {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  Year   Year   @relation(fields: [yearId], references: [id])
+  yearId String @db.ObjectId
+  User   User[]
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+  MAINTENANCE
+}
