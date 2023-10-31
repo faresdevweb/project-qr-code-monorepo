@@ -15,6 +15,18 @@ export class AuthService {
         private jwt: JwtService
     ){}
 
+    async getTeacher() {
+        const teachers = await this.prisma.user.findMany({
+            where: {
+                role: 'TEACHER'
+            }
+        });
+        for(let teacher of teachers){
+            delete teacher.hashPassword
+        }
+        return teachers;
+    }
+
     async signin(signInDTO: signInDTO) {
         // vérifie que l'utilisateur existe
         const user = await this.prisma.user.findUnique({

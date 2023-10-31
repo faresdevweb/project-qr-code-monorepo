@@ -16,6 +16,12 @@ export class AuthController {
         return this.authService.signin(signInDTO);
     }
 
+    @UseGuards(JwtGuard)
+    @Get('getTeacher')
+    getTeacher(){
+        return this.authService.getTeacher();
+    }
+
     @Post('maintenance')
     createMaintenanceAccount(@Body() maintenanceAccountDTO: maintenanceAccountDTO){
         return this.authService.createMaintenanceAccount(maintenanceAccountDTO)
